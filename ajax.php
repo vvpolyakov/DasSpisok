@@ -33,7 +33,7 @@ function testauth(){
     if ($user['id']) {
 	print json_encode($user);
     } else {
-	print json_encode(array("error"=>"Пользователь не найден"));
+	print json_encode(array("id"=>"0"));
     }
 }
 

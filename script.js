@@ -8,9 +8,10 @@ var postProgress=0;
 setInterval(function(){if(needSync)sync()},5000);
 setInterval(function(){needSync=1},60000);
 //$(window).hashchange(function(){accNavbar();});
-//$(document).on("pagechange",function(a,b){accNavbar();});
+$(document).on("pagechange",function(a,b){accNavbar();});
 $.mobile.ignoreNextHashChange = true;
 $.mobile.defaultPageTransition = 'none';
+
 
 $(document).on("pageinit", function(event){
   // initial configuration
@@ -146,7 +147,7 @@ var postComplete = function(){
 var post = function(params,callback,errorcallback) {
     postWait();
     console.log("POST: "+params.action);
-    if (!params.login) {
+    if (params.login == undefined) {
 	$.extend(params,{login:localStorage["login"+localStorage["auth"]],password:localStorage["password"+localStorage["auth"]]})
     }
     $.ajax({
@@ -184,6 +185,35 @@ var init=function(){
         return;
     }
     init.called = true;
+
+
+    document.addEventListener("menubutton", function(e){
+	accounts();
+    },false);
+    document.addEventListener("backbutton", function(e){
+	if($.mobile.activePage.is('#spisok')){
+	    if (confirm("Выйти из приложения?")){
+    		e.preventDefault();
+    		navigator.app.exitApp();
+    	    }
+	}
+	else if ($.mobile.activePage.is('#edit')) {
+	    $.mobile.changePage('#view',{changeHash: false});
+	}
+	else if ($.mobile.activePage.is('#loginform')) {
+	    $.mobile.changePage('#accounts',{changeHash: false});
+	}
+	else if ($.mobile.activePage.is('#signupform')) {
+	    $.mobile.changePage('#loginform',{changeHash: false});
+	}
+	else {
+	    $.mobile.changePage('#spisok',{changeHash: false});
+	}
+    }, false);
+    init1();
+}
+
+function init1(){
     if (!localStorage["auth"]) localStorage["auth"] = 0;
         
     post({action:"testauth"},function(data){
@@ -432,16 +462,21 @@ var accNavbar = function() {
 	accs = JSON.parse(localStorage["accounts"]);
     } catch(e){}
     var html = "<div data-role=\"navbar\" data-id=\"dasnav\" data-iconpos=\"right\"><ul>";
-    html += "<li><a class=\""+(localStorage['auth']==0?"ui-btn-active":"" )+"\" onclick=\"changeAccount(0)\">Локальный</a></li>";
+//    html += "<li><a class=\""+(localStorage['auth']==0?"ui-btn-active":"" )+"\" onclick=\"changeAccount(0)\">Локальный</a></li>";
     for (var i in accs) {
-	if (accs[i]>0) {
-	    html +="<li><a class=\""+(localStorage['auth']==accs[i]?"ui-btn-active":"" )+"\" onclick=\"changeAccount("+accs[i]+")\">"+localStorage["login"+accs[i]]+"</a></li>";
-	}
+//	if (accs[i]>0) {
+	html +="<li><a class=\""+(
+    !($.mobile.activePage.attr('id') == "loginform" ||
+    $.mobile.activePage.attr('id') == "accounts"||
+    $.mobile.activePage.attr('id') == "signupform") &&
+	    
+	localStorage['auth']==accs[i]?"ui-btn-active":"" )+"\" onclick=\"changeAccount("+accs[i]+")\">"+(accs[i]==0?"Локальный":localStorage["login"+accs[i]])+"</a></li>";
+//	}
     }
     html += "<li><a class=\""+(
     $.mobile.activePage.attr('id') == "loginform" ||
     $.mobile.activePage.attr('id') == "accounts"||
-    $.mobile.activePage.attr('id') == "signup"
+    $.mobile.activePage.attr('id') == "signupform"
      ?"ui-btn-active":"" )+"\" onClick=\"accounts()\" data-icon=\"gear\">Настройка</a></li>";
     html +="</ul></div>";
     $(".footer").html(html).find("[data-role=navbar]").navbar();
@@ -477,8 +512,7 @@ var changeAccount = function(n){
 	return;
     }
     localStorage['auth'] = n;
-    init.called=0;
-    init();
+    init1();
 }
 var deleteAccount = function(n){
     if (confirm("Удалить акаунт из списка?")) {
@@ -496,8 +530,7 @@ var deleteAccount = function(n){
 	delete localStorage["password"+n];
 	delete localStorage["spisok"+n];
 
-	init.called=0;
-	init();
+	init1();
     }
 }
 var loginShow=function(){
@@ -506,6 +539,10 @@ var loginShow=function(){
 var loginSignin=function(){
     post({action:"testauth",login:$("#loginform_login").val(), password:$("#loginform_password").val()},
 	function(data){
+	    if (data.id==0) {
+		alert("Пользователь не найден!");
+		return;
+	    }
 	    localStorage["auth"]=data.id;	
 	    localStorage["login"+localStorage["auth"]] = $("#loginform_login").val();
 	    localStorage["password"+localStorage["auth"]] = $("#loginform_password").val();
@@ -522,8 +559,7 @@ var loginSignin=function(){
 
 
 	    authMode();
-	    init.called=false;
-	    init();
+	    init1();
 	},function() {
 	    alert("Ошибка сетевого соединения");
 	}
@@ -546,8 +582,7 @@ var loginSignup = function(){
 	    accs.push(data.id);
 	    localStorage["accounts"] = JSON.stringify(accs);
 	    
-	    init.called=false;
-	    init();
+	    init1();
     },function() {
         alert("Ошибка сетевого соединения");
     });
