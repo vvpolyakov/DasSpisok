@@ -1,17 +1,27 @@
 <?
 //    header("")
+header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: *");
+
 session_start();
 mysql_connect("localhost","root","");
 mysql_select_db("spisok");
 mysql_query("set character set utf8");
 
-$user = mysql_fetch_assoc(mysql_query("SELECT * FROM user JOIN session ON user.id=session.user WHERE session.sid = '".session_id()."'"));
-unset( $user['password']);
-
-if ($_POST['action']=='testauth') testauth();
-if ($_POST['action']=='signin') signin();
-if ($_POST['action']=='logout') logout();
 if ($_POST['action']=='signup') signup();
+
+$user = mysql_fetch_assoc(mysql_query("SELECT * FROM user WHERE login='".$_POST['login']."' AND password='".$_POST['password']."'"));
+unset( $user['password']);
+if ($_POST['action']=='testauth') {
+    testauth();
+    exit;
+}
+
+if (!$user){
+    print json_encode(array("error"=>"Пользователь не найден"));
+    exit;
+}
+
 if ($_POST['action']=='spisok') spisok();
 if ($_POST['action']=='save') save();
 if ($_POST['action']=='delete') deletes();
@@ -23,7 +33,7 @@ function testauth(){
     if ($user['id']) {
 	print json_encode($user);
     } else {
-	print json_encode(array("id"=>"0"));
+	print json_encode(array("error"=>"Пользователь не найден"));
     }
 }
 
@@ -49,7 +59,8 @@ function signup() {
 	return;	
     }
     mysql_query("INSERT INTO user (login,password) VALUES ('".mysql_real_escape_string($_POST['login'])."','".mysql_real_escape_string($_POST['password'])."')");
-    print json_encode(array("ok"=>1));
+    
+    print json_encode(array("ok"=>1,"id"=>mysql_insert_id()));
 }
 
 function create(){
@@ -59,26 +70,27 @@ function create(){
 }
 function spisok() {
     global $user;
-    print json_encode(mysql_fetch_all(mysql_query("SELECT * FROM spisok WHERE user=".$user['id']."")));
+    print json_encode(mysql_fetch_all(mysql_query("SELECT id,UNIX_TIMESTAMP(dt) as dt,data,name FROM spisok WHERE user=".$user['id']."")));
 }
 function save() {
     global $user;
+    $id=$_POST['id'];
     if (!is_numeric($_POST['id'])){
 	print json_encode(array("error"=>"Ошибка"));
     } else {
-	if ($_POST['id']==0) {
+	if ($id<=0) {
 	    mysql_query("INSERT INTO spisok (name,user) VALUES ('".mysql_real_escape_string($_POST['name'])."',".$user['id'].")");
-	    $_POST['id'] = mysql_insert_id();
-	} else {
-	    $d=mysql_fetch_assoc(mysql_query("SELECT * FROM spisok WHERE id=".$_POST['id']));
+	    $id = mysql_insert_id();
+	} else if ($_POST['dt']!=0) {
+	    $d=mysql_fetch_assoc(mysql_query("SELECT UNIX_TIMESTAMP(dt) as dt,data FROM spisok WHERE id=".$id));
 	    if ($d['dt']!=$_POST['dt']) {
-		print json_encode(array("errorcode"=>"sync","dt"=>$d['dt'],"data"=>$d['data'],"id"=>$_POST['id']));
+		print json_encode(array("errorcode"=>"sync","dt"=>$d['dt'],"data"=>$d['data'],"id"=>$id));
 		return;
 	    }
 	}
-	mysql_query("UPDATE spisok SET data='".mysql_real_escape_string($_POST['data'])."' where id=".$_POST['id']);
-	$d=mysql_fetch_assoc(mysql_query("SELECT dt FROM spisok WHERE id=".$_POST['id']));
-	print json_encode(array("ok"=>1,"id"=>$_POST['id'],"dt"=>$d['dt']));
+	mysql_query("UPDATE spisok SET data='".mysql_real_escape_string($_POST['data'])."' where id=".$id);
+	$d=mysql_fetch_assoc(mysql_query("SELECT UNIX_TIMESTAMP(dt) as dt FROM spisok WHERE id=".$id));
+	print json_encode(array("ok"=>1,"id"=>$id,"postid"=>$_POST['id'],"dt"=>$d['dt']));
     }
 }
 
@@ -94,20 +106,9 @@ function deletes() {
 
 
 
-  function mysql_fetch_all ($result, $result_type = MYSQL_BOTH)
+  function mysql_fetch_all ($result)
     {
-        if (!is_resource($result) || get_resource_type($result) != 'mysql result')
-        {
-            trigger_error(__FUNCTION__ . '(): supplied argument is not a valid MySQL result resource', E_USER_WARNING);
-            return false;
-        }
-        if (!in_array($result_type, array(MYSQL_ASSOC, MYSQL_BOTH, MYSQL_NUM), true))
-        {
-            trigger_error(__FUNCTION__ . '(): result type should be MYSQL_NUM, MYSQL_ASSOC, or MYSQL_BOTH', E_USER_WARNING);
-            return false;
-        }
-        $rows = array();
-        while ($row = mysql_fetch_array($result, $result_type))
+        while ($row = mysql_fetch_assoc($result))
         {
             $rows[] = $row;
         }

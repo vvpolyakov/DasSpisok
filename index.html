@@ -1,31 +1,32 @@
+<!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width" />
-<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
+<link rel="stylesheet" href="jquery/jquery.mobile-1.4.2.min.css" />
 <link rel="stylesheet" href="style.css" />
-<meta http-equiv="content-type" content="text/html;charset=utf8">
-<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
-<script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+<meta http-equiv="content-type" content="text/html; charset=utf8">
+<script src="jquery/jquery-2.1.1.min.js"></script>
+<script src="jquery/jquery.mobile-1.4.2.min.js"></script>
 <script src="script.js"></script>
 </head>
 <body>
-
-<div data-role="page" id="main">
-    <div data-role="header">
+<div data-role="page" id="spisok">
+    <div data-role="header" data-position="fixed">
+	<button onclick="sync()" class="sync-btn ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-recycle">&nbsp;</button>
 	<h1>Списки</h1>
-    </div><!-- /header -->
-
-    <div role="main" class="ui-content">
-	
-    </div><!-- /content -->
-
-    <div data-role="footer">
-	<h4>&copy;2014</h4>
+	<button onclick="spisokEdit(0)" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">Добавить</button>
+    </div>
+    <div data-role="main" class="ui-content">
+    
+    </div>
+    <div data-role="footer" class="footer" data-position="fixed">
     </div><!-- /footer -->
-</div><!-- /page -->
+</div>
+
 
 <div data-role="page" id="loginform">
-    <div data-role="header">
+    <div data-role="header" data-position="fixed">
+	<button onclick="spisokList()" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Отмена</button>
 	<h1>Авторизация</h1>
     </div>
     <div data-role="main"  class="ui-content">
@@ -36,13 +37,12 @@
 	<button onClick="loginSignin()">Войти</button>
 	<button onClick="$.mobile.changePage('#signupform');">Регистрация</button>
     </div>
-    <div data-role="footer">
-	<h4>&copy;2014</h4>
+    <div data-role="footer" class="footer" data-id="dasfooter" data-position="fixed">
     </div><!-- /footer -->
 </div>
 
 <div data-role="page" id="signupform">
-    <div data-role="header">
+    <div data-role="header" data-position="fixed">
 	<button onclick="loginShow()" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Отмена</button>
 	<h1>Регистрация</h1>
     </div>
@@ -55,15 +55,14 @@
 	<button onClick="loginSignup()">Зарегистрироваться</button>
 	
     </div>
-    <div data-role="footer">
-	<h4>&copy;2014</h4>
+    <div data-role="footer" class="footer" data-position="fixed">
     </div><!-- /footer -->
 </div>
 
 
 
 <div data-role="page" id="edit">
-    <div data-role="header">
+    <div data-role="header" data-position="fixed">
 	<button onclick="spisokView()" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Отмена</button>
 	<h1>Редактирование</h1>
 	<button onclick="editSave()" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-check">Сохранить</button>
@@ -86,8 +85,7 @@
 	<button onClick="spisokDelete()">Удалить список</button>
 
     </div>
-    <div data-role="footer">
-	<h4>&copy;2014</h4>
+    <div data-role="footer" class="footer" data-position="fixed">
     </div><!-- /footer -->
 </div>
 
@@ -96,15 +94,14 @@
 
 
 <div data-role="page" id="view">
-    <div data-role="header">
+    <div data-role="header" data-position="fixed">
 	<button onclick="spisokList()" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Списки</button>
 	<h1>Список</h1>
 	<button onclick="spisokEdit()" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-edit">Редактировать</button>
     </div>
     <div data-role="main"  class="ui-content">
     </div>
-    <div data-role="footer">
-	<h4>&copy;2014</h4>
+    <div data-role="footer" class="footer"  data-position="fixed">
     </div><!-- /footer -->
 </div>
 
@@ -112,23 +109,11 @@
 
 
 
-<div data-role="page" id="spisok">
-    <div data-role="header">
-	<button onclick="logout()" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-power">Выход</button>
-	<h1>Списки</h1>
-	<button onclick="spisokEdit(0)" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">Добавить</button>
-    </div>
-    <div data-role="main" class="ui-content">
-    </div>
-    <div data-role="footer">
-	<h4>&copy;2014</h4>
-    </div><!-- /footer -->
-</div>
 
 
 
 <div data-role="page" id="sync">
-    <div data-role="header">
+    <div data-role="header" data-position="fixed">
 	<h1>Синхронизация</h1>
     </div>
     <div data-role="main" class="ui-content">
@@ -155,11 +140,22 @@
 	</div>
 
     </div>
-    <div data-role="footer">
-	<h4>&copy;2014</h4>
+    <div data-role="footer" class="footer" data-position="fixed">
     </div><!-- /footer -->
 </div>
 
+
+<div data-role="page" id="accounts">
+    <div data-role="header" data-position="fixed">
+	<button onclick="spisokList()" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Списки</button>
+	<h1>Мои Аккаунты</h1>
+    </div>
+    <div data-role="main" class="ui-content">
+
+    </div>
+    <div data-role="footer" class="footer" data-position="fixed">
+    </div><!-- /footer -->
+</div>
 
 
 </body>
