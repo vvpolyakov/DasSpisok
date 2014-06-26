@@ -30,7 +30,7 @@ if ($_POST['action']=='delete') deletes();
 
 function testauth(){
     global $user;
-    if ($user['id']) {
+    if ($user['id'] && $user['login']>"") {
 	print json_encode($user);
     } else {
 	print json_encode(array("id"=>"0"));

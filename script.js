@@ -230,6 +230,7 @@ function init1(){
 }
 
 var editSave=function(name,data,callback){
+    
     sI.name=name;
     sI.data=data;
     
@@ -240,6 +241,8 @@ var editSave=function(name,data,callback){
     if (sID==0) {
 	sI.id=-Math.random();
 	sID = sI.id;
+	var i=s.push({})-1;
+	s[i]=sI;
     }
     save();
     needSync=1;
@@ -280,12 +283,16 @@ var spisokEdit = function(id) {
     $.mobile.changePage('#edit',{changeHash: false});
     var i;
     var found=false;
-    if (id != undefined){
+    if (id==0) {
+	sID=id;
+	sI = {name:"",data:""};
+    }
+    if (id >0){
 	sID=id;
 	for (i in s) if (s[i].id==id) {found=true;break;}
-	if (!found) {
-	    i=s.push({})-1;	
-	}
+//	if (!found) {
+//	    i=s.push({})-1;	
+//	}
 	sI = s[i];
     }
     $("#editname").val(sI.name);
@@ -498,7 +505,7 @@ function accounts() {
 	}
     }
     html += "<button class=\"ui-btn ui-input-btn ui-corner-all ui-shadow ui-icon-plus ui-btn-icon-left\" data-icon=\"plus\" onClick=\"loginShow()\">Добавить онлайн аккаунт</button>";
-    html +="";
+    html +="Браузерная интернет-версия находится по адресу <b>http://zitenet.ru/spisok/</b>";
 //    $(".footer").html(html).find("[data-role=navbar]").navbar();
 //    alert(2);
     $("#accounts .ui-content").html(html);
