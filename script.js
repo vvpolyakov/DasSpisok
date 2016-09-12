@@ -272,7 +272,7 @@ var spisokList = function() {
 	var html = "";
 	for (i in s){
 	    if (s[i].del != 1)
-		html += "<div class=spisoklist data-id="+s[i].id+">"+s[i].name+"</div>";
+		html += "<div class=spisoklist data-id="+s[i].id+">"+s[i].name+"&nbsp;</div>";
 	}
 	$("#spisok .ui-content").html(html);
 	$(".spisoklist").button().click(function(){
@@ -505,7 +505,8 @@ function accounts() {
 	}
     }
     html += "<button class=\"ui-btn ui-input-btn ui-corner-all ui-shadow ui-icon-plus ui-btn-icon-left\" data-icon=\"plus\" onClick=\"loginShow()\">Добавить онлайн аккаунт</button>";
-    html +="Браузерная интернет-версия находится по адресу <b>http://zitenet.ru/spisok/</b>";
+    html +="Браузерная интернет-версия находится по адресу <b>http://zitenet.ru/spisok/</b><br>Скачать приложение: ";
+    html +="<a href=\"https://play.google.com/store/apps/details?id=com.phonegap.dasspisok\">Google Play</a>";
 //    $(".footer").html(html).find("[data-role=navbar]").navbar();
 //    alert(2);
     $("#accounts .ui-content").html(html);
